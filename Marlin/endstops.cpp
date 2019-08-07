@@ -183,7 +183,11 @@ void Endstops::report_state() {
   }
 } // Endstops::report_state
 
-void Endstops::M119() {
+void _O2 Endstops::M119() {
+  #if ENABLED(BLTOUCH)
+    extern void _bltouch_set_SW_mode();
+    _bltouch_set_SW_mode();
+  #endif
   SERIAL_PROTOCOLLNPGM(MSG_M119_REPORT);
   #if HAS_X_MIN
     SERIAL_PROTOCOLPGM(MSG_X_MIN);
@@ -224,6 +228,10 @@ void Endstops::M119() {
   #if ENABLED(FILAMENT_RUNOUT_SENSOR)
     SERIAL_PROTOCOLPGM(MSG_FILAMENT_RUNOUT_SENSOR);
     SERIAL_PROTOCOLLN(((READ(FIL_RUNOUT_PIN)^FIL_RUNOUT_INVERTING) ? MSG_ENDSTOP_HIT : MSG_ENDSTOP_OPEN));
+  #endif
+  #if ENABLED(BLTOUCH)
+    extern void _bltouch_reset_SW_mode();
+    _bltouch_reset_SW_mode();
   #endif
 } // Endstops::M119
 

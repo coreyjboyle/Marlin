@@ -36,9 +36,8 @@
  *
  */
 
-#define EEPROM_VERSION "V41"
-
 // Change EEPROM version if these are changed:
+#define EEPROM_VERSION "V56"
 #define EEPROM_OFFSET 100
 
 /**
@@ -201,6 +200,10 @@ MarlinSettings settings;
   #include "ubl.h"
 #endif
 
+#if ENABLED(BLTOUCH)
+  extern bool bltouch_last_written_mode;
+#endif
+
 #if ENABLED(AUTO_BED_LEVELING_BILINEAR)
   extern void refresh_bed_level();
 #endif
@@ -260,6 +263,15 @@ void MarlinSettings::postprocess() {
   #define EEPROM_READ(VAR) read_data(eeprom_index, (uint8_t*)&VAR, sizeof(VAR), &working_crc)
   #define EEPROM_ASSERT(TST,ERR) if (!(TST)) do{ SERIAL_ERROR_START(); SERIAL_ERRORLNPGM(ERR); eeprom_read_error = true; }while(0)
 
+  #if ENABLED(DEBUG_EEPROM_READWRITE)
+    #define _FIELD_TEST(FIELD) \
+      EEPROM_ASSERT( \
+        eeprom_error || eeprom_index == offsetof(SettingsData, FIELD) + EEPROM_OFFSET, \
+        "Field " STRINGIFY(FIELD) " mismatch." \
+      )
+  #else
+    #define _FIELD_TEST(FIELD) NOOP
+  #endif
   const char version[4] = EEPROM_VERSION;
 
   bool MarlinSettings::eeprom_error;
@@ -447,6 +459,20 @@ void MarlinSettings::postprocess() {
       EEPROM_WRITE(dummy);
       EEPROM_WRITE(storage_slot);
     #endif // AUTO_BED_LEVELING_UBL
+
+    //
+    // BLTOUCH
+    //
+    {
+      _FIELD_TEST(bltouch_last_written_mode);
+      #if ENABLED(BLTOUCH)
+        const bool &eeprom_bltouch_last_written_mode = bltouch_last_written_mode;
+      #else
+        constexpr bool eeprom_bltouch_last_written_mode = false;
+      #endif
+      EEPROM_WRITE(eeprom_bltouch_last_written_mode);
+    }
+
 
     // 10 floats for DELTA / Z_DUAL_ENDSTOPS
     #if ENABLED(DELTA)
@@ -837,6 +863,19 @@ void MarlinSettings::postprocess() {
         EEPROM_READ(dummy);
         EEPROM_READ(dummyui8);
       #endif // AUTO_BED_LEVELING_UBL
+
+      //
+      // BLTOUCH
+      //
+      {
+        _FIELD_TEST(bltouch_last_written_mode);
+        #if ENABLED(BLTOUCH)
+          bool &eeprom_bltouch_last_written_mode = bltouch_last_written_mode;
+        #else
+          bool eeprom_bltouch_last_written_mode;
+        #endif
+        EEPROM_READ(eeprom_bltouch_last_written_mode);
+      }
 
       #if ENABLED(DELTA)
         EEPROM_READ(endstop_adj);               // 3 floats

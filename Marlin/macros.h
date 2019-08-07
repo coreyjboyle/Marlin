@@ -181,9 +181,11 @@
 
 #define CEILING(x,y) (((x) + (y) - 1) / (y))
 
+#define MIN(a, b)           min(a, b)
 #define MIN3(a, b, c)       min(min(a, b), c)
 #define MIN4(a, b, c, d)    min(MIN3(a, b, c), d)
 #define MIN5(a, b, c, d, e) min(MIN4(a, b, c, d), e)
+#define MAX(a, b)           max(a, b)
 #define MAX3(a, b, c)       max(max(a, b), c)
 #define MAX4(a, b, c, d)    max(MAX3(a, b, c), d)
 #define MAX5(a, b, c, d, e) max(MAX4(a, b, c, d), e)
