@@ -564,10 +564,10 @@
   #define MSG_STOP_PRINT                      _UxGT("Stop print")
 #endif
 #ifndef MSG_CARD_MENU
-  #define MSG_CARD_MENU                       _UxGT("Print from TF")
+  #define MSG_CARD_MENU                       _UxGT("Print from SD")
 #endif
 #ifndef MSG_NO_CARD
-  #define MSG_NO_CARD                         _UxGT("No TF card")
+  #define MSG_NO_CARD                         _UxGT("No SD card")
 #endif
 #ifndef MSG_DWELL
   #define MSG_DWELL                           _UxGT("Sleep...")
@@ -621,10 +621,10 @@
   #define MSG_FILAMENTCHANGE                  _UxGT("Change filament")
 #endif
 #ifndef MSG_INIT_SDCARD
-  #define MSG_INIT_SDCARD                     _UxGT("Init. TF card")
+  #define MSG_INIT_SDCARD                     _UxGT("Init. SD card")
 #endif
 #ifndef MSG_CNG_SDCARD
-  #define MSG_CNG_SDCARD                      _UxGT("Change TF card")
+  #define MSG_CNG_SDCARD                      _UxGT("Change SD card")
 #endif
 #ifndef MSG_ZPROBE_OUT
   #define MSG_ZPROBE_OUT                      _UxGT("Z probe out. bed")

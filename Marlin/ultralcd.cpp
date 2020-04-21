@@ -758,8 +758,7 @@ void kill_screen(const char* lcd_msg) {
     int mytemphot = 0;
     int mytempbed = 0;
     float pause_z = 0;
-    void lcd_sdcard_pause() 
-    {
+    void lcd_sdcard_pause() {
       card.pauseSDPrint();
       print_job_timer.pause();
 
@@ -779,8 +778,7 @@ void kill_screen(const char* lcd_msg) {
       lcd_setstatusPGM(PSTR(MSG_PRINT_PAUSED), -1);
     }
 
-    void lcd_sdcard_resume() 
-    {
+    void lcd_sdcard_resume() {
       char cmd1[30];
       char pause_str_Z[16];
 
@@ -789,8 +787,7 @@ void kill_screen(const char* lcd_msg) {
       SERIAL_PROTOCOLLN(pause_str_Z);
       SERIAL_PROTOCOLLN("lcd_sdcard_resume() pause_str_Z");
       #if ENABLED(POWEROFF_SAVE_SD_FILE)
-        if (power_off_commands_count > 0)
-        {
+        if (power_off_commands_count > 0) {
           sprintf_P(cmd1, PSTR("M190 S%i"), power_off_info.target_temperature_bed);
           enqueue_and_echo_command(cmd1);
           sprintf_P(cmd1, PSTR("M109 S%i"), power_off_info.target_temperature[0]);
@@ -800,8 +797,7 @@ void kill_screen(const char* lcd_msg) {
           // enqueue_and_echo_command(cmd1);
           power_off_type_yes = 1;
         }
-        else
-        {
+        else {
           sprintf_P(cmd1, PSTR("M140 S%i"), mytempbed);
           enqueue_and_echo_command(cmd1);
           sprintf_P(cmd1, PSTR("M109 S%i"), mytemphot);
@@ -828,8 +824,7 @@ void kill_screen(const char* lcd_msg) {
       lcd_reset_status();
     }
 
-    void lcd_sdcard_stop() 
-    {
+    void lcd_sdcard_stop() {
       card.stopSDPrint();
       clear_command_queue();
       quickstop_stepper();
@@ -839,8 +834,7 @@ void kill_screen(const char* lcd_msg) {
         card.openPowerOffFile(power_off_info.power_off_filename, O_CREAT | O_WRITE | O_TRUNC | O_SYNC);
         power_off_info.valid_head = 0;
         power_off_info.valid_foot = 0;
-        if (card.savePowerOffInfo(&power_off_info, sizeof(power_off_info)) == -1)
-        {
+        if (card.savePowerOffInfo(&power_off_info, sizeof(power_off_info)) == -1) {
           SERIAL_PROTOCOLLN("Stop to Write power off file failed.");
         }
         card.closePowerOffFile();
@@ -918,10 +912,6 @@ void kill_screen(const char* lcd_msg) {
       MENU_ITEM(gcode, MSG_BLTOUCH_SELFTEST, PSTR("M280 P" STRINGIFY(Z_ENDSTOP_SERVO_NR) " S" STRINGIFY(BLTOUCH_SELFTEST)));
       MENU_ITEM(gcode, MSG_BLTOUCH_DEPLOY, PSTR("M280 P" STRINGIFY(Z_ENDSTOP_SERVO_NR) " S" STRINGIFY(BLTOUCH_DEPLOY)));
       MENU_ITEM(gcode, MSG_BLTOUCH_STOW, PSTR("M280 P" STRINGIFY(Z_ENDSTOP_SERVO_NR) " S" STRINGIFY(BLTOUCH_STOW)));
-      // BLTouch has no physical response under these instructions, so delete the control display to avoid user misunderstanding
-	  // MENU_ITEM(gcode, MSG_BLTOUCH_SW_MODE, PSTR("M280 P" STRINGIFY(Z_ENDSTOP_SERVO_NR) " S" STRINGIFY(BLTOUCH_SW_MODE)));
-      // MENU_ITEM(gcode, MSG_BLTOUCH_5V_MODE, PSTR("M280 P" STRINGIFY(Z_ENDSTOP_SERVO_NR) " S" STRINGIFY(BLTOUCH_5V_MODE)));
-      // MENU_ITEM(gcode, MSG_BLTOUCH_OD_MODE, PSTR("M280 P" STRINGIFY(Z_ENDSTOP_SERVO_NR) " S" STRINGIFY(BLTOUCH_OD_MODE)));
       END_MENU();
     }
 
@@ -1031,8 +1021,7 @@ void kill_screen(const char* lcd_msg) {
    *
    */
 
-  void lcd_main_menu()
-  {
+  void lcd_main_menu() {
     START_MENU();
     MENU_BACK(MSG_WATCH);
 
@@ -1051,54 +1040,41 @@ void kill_screen(const char* lcd_msg) {
     // Set Case light on/off/brightness
     //
     #if ENABLED(MENU_ITEM_CASE_LIGHT)
-      if (USEABLE_HARDWARE_PWM(CASE_LIGHT_PIN)) 
-      {
+      if (USEABLE_HARDWARE_PWM(CASE_LIGHT_PIN)) {
         MENU_ITEM(submenu, MSG_CASE_LIGHT, case_light_menu);
       }
       else
-      {
         MENU_ITEM_EDIT_CALLBACK(bool, MSG_CASE_LIGHT, (bool*)&case_light_on, update_case_light);
-      }
     #endif
 
-    if (planner.movesplanned() || IS_SD_PRINTING)
-    {
+    if (planner.movesplanned() || IS_SD_PRINTING) {
       MENU_ITEM(submenu, MSG_TUNE, lcd_tune_menu);
     }
-    else
-    {
+    else {
       MENU_ITEM(submenu, MSG_PREPARE, lcd_prepare_menu);
     }
     MENU_ITEM(submenu, MSG_CONTROL, lcd_control_menu);
 
     #if ENABLED(SDSUPPORT)
-      if (card.cardOK)
-      {
-        if (card.isFileOpen())
-        {
+      if (card.cardOK) {
+        if (card.isFileOpen()) {
           #if ENABLED(SDSUPPORT) && ENABLED(POWEROFF_SAVE_SD_FILE)
-            if (power_off_commands_count > 0)
-            {
+            if (power_off_commands_count > 0) {
               // MENU_ITEM(submenu, MSG_RESUME_PRINT_OK, lcd_resume_ok_menu);
-              if (card.sdprinting)
-              {
+              if (card.sdprinting) {
                 MENU_ITEM(function, MSG_PAUSE_PRINT, lcd_sdcard_pause);
               }
-              else
-              {
+              else {
                 MENU_ITEM(function, MSG_RESUME_PRINT, lcd_sdcard_resume);
               }
               MENU_ITEM(function, MSG_STOP_PRINT, lcd_sdcard_stop);
             }
-            else
-            {
+            else {
           #endif
-              if (card.sdprinting)
-              {
+              if (card.sdprinting) {
                 MENU_ITEM(function, MSG_PAUSE_PRINT, lcd_sdcard_pause);
               }
-              else
-              {
+              else {
                 MENU_ITEM(function, MSG_RESUME_PRINT, lcd_sdcard_resume);
               }
               MENU_ITEM(function, MSG_STOP_PRINT, lcd_sdcard_stop);
@@ -1106,16 +1082,14 @@ void kill_screen(const char* lcd_msg) {
             }
           #endif
         }
-        else 
-        {
+        else {
           MENU_ITEM(submenu, MSG_CARD_MENU, lcd_sdcard_menu);
           #if !PIN_EXISTS(SD_DETECT)
             MENU_ITEM(gcode, MSG_CNG_SDCARD, PSTR("M21"));  // SD-card changed by user
           #endif
         }
       }
-      else 
-      {
+      else {
         MENU_ITEM(submenu, MSG_NO_CARD, lcd_sdcard_menu);
         #if !PIN_EXISTS(SD_DETECT)
           MENU_ITEM(gcode, MSG_INIT_SDCARD, PSTR("M21")); // Manually initialize the SD-card via user interface
@@ -2671,8 +2645,7 @@ static void lcd_autohome()
     //
     // Auto Home
     //
-    // MENU_ITEM(gcode, msg_auto_home(), PSTR("G28"));
-	  MENU_ITEM(function, MSG_AUTO_HOME, lcd_autohome);	
+    MENU_ITEM(function, MSG_AUTO_HOME, lcd_autohome);	
     #if ENABLED(INDIVIDUAL_AXIS_HOMING_MENU)
       MENU_ITEM(gcode, MSG_AUTO_HOME_X, PSTR("G28 X"));
       MENU_ITEM(gcode, MSG_AUTO_HOME_Y, PSTR("G28 Y"));
@@ -3489,6 +3462,7 @@ static void lcd_autohome()
       #endif // !PID_PARAMS_PER_HOTEND || HOTENDS == 1
 
     #endif // PIDTEMP
+
 */
     //
     // Preheat Material 1 conf
@@ -4641,8 +4615,7 @@ void lcd_update() {
     lcd_buttons_update();
 
     #if ENABLED(SDSUPPORT) && ENABLED(POWEROFF_SAVE_SD_FILE)
-      if ((power_off_type_yes == 0) && (power_off_commands_count > 0))
-      {
+      if ((power_off_type_yes == 0) && (power_off_commands_count > 0)) {
         currentScreen = lcd_resume_ok_menu;
       }
     #endif
@@ -4654,51 +4627,37 @@ void lcd_update() {
     #endif
 
     // If the action button is pressed...
-    if (UBL_CONDITION && LCD_CLICKED)
-    {
-      if (!wait_for_unclick)
-      {
-        // If not waiting for a debounce release:
-        wait_for_unclick = true;        // Set debounce flag to ignore continous clicks
-        lcd_clicked = !wait_for_user;   // Keep the click if not waiting for a user-click
-        wait_for_user = false;          // Any click clears wait for user
-        lcd_quick_feedback();           // Always make a click sound
+    if (UBL_CONDITION && LCD_CLICKED) {
+      if (!wait_for_unclick) {           // If not waiting for a debounce release:
+        wait_for_unclick = true;         //  Set debounce flag to ignore continous clicks
+        lcd_clicked = !wait_for_user;    //  Keep the click if not waiting for a user-click
+        wait_for_user = false;           //  Any click clears wait for user
+        lcd_quick_feedback();            //  Always make a click sound
       }
     }
-    else
-    {
-      wait_for_unclick = false;
-    }
+    else wait_for_unclick = false;
   #endif
 
   #if ENABLED(SDSUPPORT) && PIN_EXISTS(SD_DETECT)
 
     const bool sd_status = IS_SD_INSERTED;
-    if (sd_status != lcd_sd_status && lcd_detected())
-    {
-      if (sd_status)
-      {
+    if (sd_status != lcd_sd_status && lcd_detected()) {
+
+      if (sd_status) {
         card.initsd();
-        if (lcd_sd_status != 2) 
-        {
-          LCD_MESSAGEPGM(MSG_SD_INSERTED);
-        }
+        if (lcd_sd_status != 2) LCD_MESSAGEPGM(MSG_SD_INSERTED);
         #if ENABLED(SDSUPPORT) && ENABLED(POWEROFF_SAVE_SD_FILE)
           init_power_off_info();
         #endif
       }
       else {
         card.release();
-        if (lcd_sd_status != 2) 
-        {
-          LCD_MESSAGEPGM(MSG_SD_REMOVED);
-        }
+        if (lcd_sd_status != 2) LCD_MESSAGEPGM(MSG_SD_REMOVED);
       }
 
       lcd_sd_status = sd_status;
       lcdDrawUpdate = LCDVIEW_CLEAR_CALL_REDRAW;
-      // to maybe revive the LCD if static electricity killed it.
-      lcd_implementation_init(
+      lcd_implementation_init( // to maybe revive the LCD if static electricity killed it.
         #if ENABLED(LCD_PROGRESS_BAR)
           currentScreen == lcd_status_screen
         #endif
@@ -4729,9 +4688,7 @@ void lcd_update() {
       #if ENABLED(ADC_KEYPAD)
 
         if (handle_adc_keypad())
-        {
           return_to_status_ms = ms + LCD_TIMEOUT_TO_STATUS;
-        }
 
       #elif ENABLED(REPRAPWORLD_KEYPAD)
 
@@ -4740,32 +4697,22 @@ void lcd_update() {
       #endif
 
       bool encoderPastThreshold = (abs(encoderDiff) >= ENCODER_PULSES_PER_STEP);
-      if (encoderPastThreshold || lcd_clicked) 
-      {
-        if (encoderPastThreshold) 
-        {
+      if (encoderPastThreshold || lcd_clicked) {
+        if (encoderPastThreshold) {
           int32_t encoderMultiplier = 1;
 
           #if ENABLED(ENCODER_RATE_MULTIPLIER)
 
-            if (encoderRateMultiplierEnabled) 
-            {
+            if (encoderRateMultiplierEnabled) {
               int32_t encoderMovementSteps = abs(encoderDiff) / ENCODER_PULSES_PER_STEP;
 
-              if (lastEncoderMovementMillis) 
-              {
+              if (lastEncoderMovementMillis) {
                 // Note that the rate is always calculated between two passes through the
                 // loop and that the abs of the encoderDiff value is tracked.
                 float encoderStepRate = float(encoderMovementSteps) / float(ms - lastEncoderMovementMillis) * 1000.0;
 
-                if (encoderStepRate >= ENCODER_100X_STEPS_PER_SEC)
-                {
-                  encoderMultiplier = 100;
-                }
-                else if (encoderStepRate >= ENCODER_10X_STEPS_PER_SEC) 
-                {
-                  encoderMultiplier = 10;
-                }
+                if (encoderStepRate >= ENCODER_100X_STEPS_PER_SEC)     encoderMultiplier = 100;
+                else if (encoderStepRate >= ENCODER_10X_STEPS_PER_SEC) encoderMultiplier = 10;
 
                 #if ENABLED(ENCODER_RATE_MULTIPLIER_DEBUG)
                   SERIAL_ECHO_START();
@@ -4797,8 +4744,7 @@ void lcd_update() {
         currentScreen == lcd_status_screen &&
       #endif
       !lcd_status_update_delay--
-    ) 
-    {
+    ) {
       lcd_status_update_delay = 9
         #if ENABLED(DOGLCD)
           + 3
@@ -4821,8 +4767,7 @@ void lcd_update() {
         if (!drawing_screen)
       #endif
         {
-          switch (lcdDrawUpdate) 
-          {
+          switch (lcdDrawUpdate) {
             case LCDVIEW_CALL_NO_REDRAW:
               lcdDrawUpdate = LCDVIEW_NONE;
               break;
@@ -4846,16 +4791,14 @@ void lcd_update() {
       #endif
 
       #if ENABLED(DOGLCD)  // Changes due to different driver architecture of the DOGM display
-        if (!drawing_screen) 
-        {
+        if (!drawing_screen) {
           u8g.firstPage();
           drawing_screen = 1;
         }
         lcd_setFont(FONT_MENU);
         u8g.setColorIndex(1);
         CURRENTSCREEN();
-        if (drawing_screen && (drawing_screen = u8g.nextPage())) 
-        {
+        if (drawing_screen && (drawing_screen = u8g.nextPage())) {
           NOLESS(max_display_update_time, millis() - ms);
           return;
         }
@@ -4869,13 +4812,9 @@ void lcd_update() {
 
       // Return to Status Screen after a timeout
       if (currentScreen == lcd_status_screen || defer_return_to_status)
-      {
         return_to_status_ms = ms + LCD_TIMEOUT_TO_STATUS;
-      }
       else if (ELAPSED(ms, return_to_status_ms))
-      {
         lcd_return_to_status();
-      }
 
     #endif // ULTIPANEL
 
@@ -4883,8 +4822,7 @@ void lcd_update() {
       if (!drawing_screen)
     #endif
       {
-        switch (lcdDrawUpdate) 
-        {
+        switch (lcdDrawUpdate) {
           case LCDVIEW_CLEAR_CALL_REDRAW:
             lcd_implementation_clear();
           case LCDVIEW_CALL_REDRAW_NEXT:
